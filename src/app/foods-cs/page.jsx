@@ -923,13 +923,16 @@ const foodsData = [
 
 const CSFoodsPage = () => {
   const [foods, setFoods] = useState([]);
+  const [allFoods, setAllFoods] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
 
   const fetchFoods = () => {
     setLoading(true);
 
     setTimeout(() => {
       setFoods(foodsData);
+      setAllFoods(foodsData);
       setLoading(false);
     }, 1000);
   };
@@ -937,6 +940,18 @@ const CSFoodsPage = () => {
   useEffect(() => {
     fetchFoods();
   }, []);
+
+  useEffect(() => {
+    if (searchInput === "") {
+      setFoods(allFoods);
+    } else {
+      const searchingFoods = allFoods.filter((food) =>
+        food.dish_name.toLowerCase().includes(searchInput.toLocaleLowerCase()),
+      );
+
+      setFoods(searchingFoods);
+    }
+  }, [searchInput, allFoods]);
 
   return (
     <section className="container mx-auto px-5">
@@ -956,6 +971,8 @@ const CSFoodsPage = () => {
           <div className="mb-6 max-w-5xl mx-auto p-3 bg-[#212121] rounded-lg flex gap-4 justify-between items-center">
             <input
               type="search"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search foods... (e.g. burger, pizza)"
               className="w-full px-5 py-3 bg-zinc-100 dark:bg-zinc-800 border border-transparent focus:border-orange-500 rounded-xl outline-none text-lg placeholder:text-zinc-400"
             />
