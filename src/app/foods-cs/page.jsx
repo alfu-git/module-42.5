@@ -425,6 +425,7 @@ const foodsData = [
   },
   {
     id: "food_009",
+    category: "salad",
     dish_name: "Shrimp Salad Bowl with Fresh Vegetables",
     alternative_names: [
       "Grilled Shrimp Cucumber Tomato Salad",
@@ -926,6 +927,7 @@ const CSFoodsPage = () => {
   const [allFoods, setAllFoods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchInput, setSearchInput] = useState("");
+  const [filterInput, setFilterInput] = useState("");
 
   const fetchFoods = () => {
     setLoading(true);
@@ -941,23 +943,33 @@ const CSFoodsPage = () => {
     fetchFoods();
   }, []);
 
-  useEffect(() => {
-    if (searchInput === "") {
-      setFoods(allFoods);
-    } else {
-      const searchingFoods = allFoods.filter((food) =>
-        food.dish_name.toLowerCase().includes(searchInput.toLocaleLowerCase()),
-      );
+  const handleFilter = (e) => {
+    setFilterInput(e.target.value);
+  };
 
-      setFoods(searchingFoods);
+  useEffect(() => {
+    let updatedFoods = [...allFoods];
+
+    if (searchInput !== "") {
+      updatedFoods = updatedFoods.filter((food) =>
+        food.dish_name.toLowerCase().includes(searchInput.toLowerCase()),
+      );
     }
-  }, [searchInput, allFoods]);
+
+    if (filterInput !== "") {
+      updatedFoods = updatedFoods.filter(
+        (food) => food.category.toLowerCase() === filterInput.toLowerCase(),
+      );
+    }
+
+    setFoods(updatedFoods);
+  }, [searchInput, filterInput, allFoods]);
 
   return (
-    <section className="container mx-auto px-5">
+    <section className="my-10 container mx-auto px-5">
       <div>
         <div>
-          <h2 className="mt-5 mb-7 text-3xl font-medium flex gap-2 items-center justify-center">
+          <h2 className="mb-7 text-3xl font-medium flex gap-2 items-center justify-center">
             <span>Discover Delicious Foods</span>
 
             <Image
@@ -985,30 +997,34 @@ const CSFoodsPage = () => {
               <div>
                 <select
                   id="dropdown"
+                  value={filterInput}
+                  onChange={handleFilter}
                   className="px-4 py-3 bg-zinc-100 dark:bg-zinc-800 border border-transparent focus:border-orange-500 rounded-xl outline-none text-lg"
                 >
                   <option value="">All Categories</option>
+                  <option value="dish">Dish</option>
+                  <option value="biriyani">Biriyani</option>
                   <option value="burger">Burger</option>
-                  <option value="pizza">Pizza</option>
-                  <option value="desert">Desert</option>
                   <option value="beverage">Beverage</option>
-                  <option value="rice">Rice</option>
+                  <option value="salad">Salad</option>
                 </select>
               </div>
             </div>
           </div>
 
-          {loading ? (
-            <Spinner />
-          ) : foods.length === 0 ? (
-            <NoFood />
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {foods.map((food) => (
-                <FoodCard key={food.id} food={food} />
-              ))}
-            </div>
-          )}
+          <div>
+            {loading ? (
+              <Spinner />
+            ) : foods.length === 0 ? (
+              <NoFood />
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {foods.map((food) => (
+                  <FoodCard key={food.id} food={food} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
